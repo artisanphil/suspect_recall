@@ -1,26 +1,30 @@
 import React, { useState, useEffect } from 'react';
 
-const Game = () => {
-  const [imageSrc, setImageSrc] = useState('');
+const Game: React.FC = () => {
+  const [timeLeft, setTimeLeft] = useState(5);
+  const [showImage, setShowImage] = useState(true);
 
   useEffect(() => {
-    const fetchImage = async () => {
-      try {
-        const response = await fetch('/persons/1.png');
-        const imageBlob = await response.blob();
-        const imageObjectURL = URL.createObjectURL(imageBlob);
-        setImageSrc(imageObjectURL);
-      } catch (error) {
-        console.error('Error fetching the image:', error);
-      }
-    };
-
-    fetchImage();
-  }, []);
+    if (timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    } else {
+      setShowImage(false);
+    }
+  }, [timeLeft]);
 
   return (
-    <div>
-      {imageSrc ? <img src={imageSrc} alt="Person" /> : <p>Loading...</p>}
+    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      {showImage ? (
+        <>
+          <img src="persons/1.png" alt="Person" />
+          <p>Time left: {timeLeft} seconds</p>
+        </>
+      ) : (
+        <p>Which attributes match this person?</p>
+      )}
     </div>
   );
 };
