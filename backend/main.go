@@ -1,13 +1,18 @@
 package main
 
 import (
-	"net/http"
+	"suspectRecall/router"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("./public")))
-	err := http.ListenAndServe(":3001", nil)
-	if err != nil {
-		panic("Error: " + err.Error())
-	}
+	r := gin.Default()
+	r.Static("/public", "./public")
+	r.NoRoute(func(ctx *gin.Context) {
+		ctx.File("./public/index.html")
+	})
+	router.InitializeRoutes(r)
+
+	r.Run(":3001")
 }

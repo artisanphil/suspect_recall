@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AttributesGrid from './AttributesGrid';
 
 const Game: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(5);
@@ -19,11 +20,14 @@ const Game: React.FC = () => {
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       {showImage ? (
         <>
-          <img src="persons/1.png" alt="Person" />
+          <img src="public/persons/1.png" alt="Person" />
           <p>Time left: {timeLeft} seconds</p>
         </>
       ) : (
-        <p>Which attributes match this person?</p>
+        <div>
+          <p>Which attributes match this person?</p>
+          <AttributesGrid />
+        </div>
       )}
     </div>
   );
