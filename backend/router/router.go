@@ -10,4 +10,6 @@ import (
 func InitializeRoutes(r *gin.Engine) {
 	r.GET("/api/person/attributes", handlers.GetItems)
 	r.GET("/api/person/image/:filename", handlers.GetImage)
+	r.POST("/api/person/:id/check-attribute", handlers.CheckAttribute)
+
 }

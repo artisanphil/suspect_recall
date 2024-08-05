@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -49,4 +50,37 @@ func GetItems(c *gin.Context) {
 	ShuffleLines(items)
 
 	c.JSON(http.StatusOK, gin.H{"items": items})
+}
+
+func CheckAttribute(c *gin.Context) {
+	id := c.Param("id")
+	_, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid person ID"})
+		return
+	}
+
+	var req struct {
+		Attribute string `json:"attribute" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	hasFilePath := "./private/persons/" + id + "-has.txt"
+	has, err := ReadLines(hasFilePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to read " + id + "-has.txt"})
+		return
+	}
+
+	for _, line := range has {
+		if line == req.Attribute {
+			c.JSON(http.StatusOK, gin.H{"exists": true})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"exists": false})
 }

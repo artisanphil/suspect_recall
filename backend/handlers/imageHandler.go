@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetImage handles the request to serve the image file
 func GetImage(c *gin.Context) {
 	filename := c.Param("filename")
 	filepath := filepath.Join("./public/persons", filename)
@@ -21,7 +20,6 @@ func GetImage(c *gin.Context) {
 	c.File(filepath)
 }
 
-// fileExists checks if a file exists and is not a directory
 func fileExists(path string) bool {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {
