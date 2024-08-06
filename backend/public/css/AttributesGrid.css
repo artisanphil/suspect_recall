@@ -13,8 +13,18 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
+
+  .grid-item.green {
+    background-color: green;
+    color: white;
+  }
   
-  .grid-item:hover {
+  .grid-item.red {
+    background-color: red;
+    color: white;
+  }
+  
+  .grid-item:not(.green):not(.red):hover {    
     background-color: #ddd;
   }
   
