@@ -61,7 +61,8 @@ func CheckAttribute(c *gin.Context) {
 	}
 
 	var req struct {
-		Attribute string `json:"attribute" binding:"required"`
+		ClickedAttribute string   `json:"clickedAttribute" binding:"required"`
+		Attributes       []string `json:"attributes" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
@@ -76,7 +77,7 @@ func CheckAttribute(c *gin.Context) {
 	}
 
 	for _, line := range has {
-		if line == req.Attribute {
+		if line == req.ClickedAttribute {
 			c.JSON(http.StatusOK, gin.H{"exists": true})
 			return
 		}

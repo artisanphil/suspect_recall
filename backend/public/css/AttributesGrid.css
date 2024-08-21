@@ -14,17 +14,17 @@
     transition: background-color 0.3s ease;
   }
 
-  .grid-item.green {
+  .grid-item.correct {
     background-color: green;
     color: white;
   }
   
-  .grid-item.red {
+  .grid-item.wrong {
     background-color: red;
     color: white;
   }
   
-  .grid-item:not(.green):not(.red):hover {    
+  .grid-item:not(.correct):not(.wrong):hover {    
     background-color: #ddd;
   }
   

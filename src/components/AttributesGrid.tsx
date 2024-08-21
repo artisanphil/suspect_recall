@@ -9,7 +9,7 @@ interface Item {
 const AttributesGrid: React.FC = () => {    
   const [items, setItems] = useState<Item[]>([]);
 
-  //prevent click of back button
+  // Prevent click of back button
   useEffect(() => {
     window.history.pushState(null, '', window.location.href);
 
@@ -41,23 +41,32 @@ const AttributesGrid: React.FC = () => {
   const handleClick = async (index: number, personId: number) => {
     if (items[index].clicked) return;
 
-    const attribute = items[index].attribute;
-    console.log('Clicked item:', attribute);
+    const clickedAttribute = items[index].attribute;
+    console.log('Clicked item:', clickedAttribute);
     console.log('person', personId);
   
     try {
+      // Get all items with the class name `grid-item correct` or `grid-item wrong`
+      const correctOrWrongItems = items
+        .filter((item, idx) => 
+          (document.getElementById(`item-${idx}`)?.classList.contains('correct') || 
+           document.getElementById(`item-${idx}`)?.classList.contains('wrong')) && 
+          idx !== index)
+        .map(item => item.attribute);
+
+      // Post these items to the endpoint
       const response = await fetch(`/api/person/${personId}/check-attribute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ attribute }),
+        body: JSON.stringify({ clickedAttribute: clickedAttribute, attributes: correctOrWrongItems }),
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+
       const result = await response.json();
       console.log(`Attribute exists: ${result.exists}`);
 
@@ -67,16 +76,17 @@ const AttributesGrid: React.FC = () => {
         return newItems;
       });
     } catch (error) {
-      console.error('Error checking attribute:', error);
-    }
+      console.error(error);
+    }    
   };
 
   return (
     <div className="grid-container">
       {items.map((item, index) => (
-        <div 
-          key={index} 
-          className={`grid-item ${item.clicked ? (item.exists ? 'green' : 'red') : ''}`} 
+        <div
+          key={index}
+          id={`item-${index}`}
+          className={`grid-item ${item.exists === null ? '' : item.exists ? 'correct' : 'wrong'}`}
           onClick={() => handleClick(index, 1)}
           style={{ cursor: item.clicked ? 'default' : 'pointer' }}
         >
