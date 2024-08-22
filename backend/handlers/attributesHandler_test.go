@@ -22,7 +22,8 @@ type attributeExists struct {
 }
 
 type PostAttribute struct {
-	Attribute string `json:"attribute"`
+	ClickedAttribute string   `json:"clickedAttribute"`
+	Attributes       []string `json:"attributes"`
 }
 
 // Helper function to create a temporary file with content
@@ -86,7 +87,8 @@ func TestGetItems(t *testing.T) {
 
 func TestCheckAttribute(t *testing.T) {
 	itemData := PostAttribute{
-		Attribute: "Male",
+		ClickedAttribute: "Male",
+		Attributes:       []string{"Full beard", "Obese"},
 	}
 	jsonData, err := json.Marshal(itemData)
 
@@ -95,6 +97,7 @@ func TestCheckAttribute(t *testing.T) {
 		"application/json",
 		bytes.NewBuffer(jsonData),
 	)
+
 	if err != nil {
 		t.Fatalf("Failed to make POST request: %v", err)
 	}
