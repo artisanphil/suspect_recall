@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"slices"
 	"strconv"
 	"time"
 
@@ -70,18 +71,35 @@ func CheckAttribute(c *gin.Context) {
 	}
 
 	hasFilePath := "./private/persons/" + id + "-has.txt"
-	has, err := ReadLines(hasFilePath)
+	hasAttributes, err := ReadLines(hasFilePath)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to read " + id + "-has.txt"})
 		return
 	}
 
-	for _, line := range has {
-		if line == req.ClickedAttribute {
-			c.JSON(http.StatusOK, gin.H{"exists": true})
-			return
+	correct := 0
+	mistakes := 0
+	for _, attribute := range req.Attributes {
+		if slices.Contains(hasAttributes, attribute) {
+			correct += 1
+		} else {
+			mistakes += 1
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"exists": false})
+	exists := slices.Contains(hasAttributes, req.ClickedAttribute)
+
+	if exists {
+		correct += 1
+	} else {
+		mistakes += 1
+	}
+
+	finished := correct == len(hasAttributes)
+
+	c.JSON(http.StatusOK, gin.H{
+		"exists":   exists,
+		"mistakes": mistakes,
+		"finished": finished,
+	})
 }

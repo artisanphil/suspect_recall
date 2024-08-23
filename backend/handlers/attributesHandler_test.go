@@ -10,6 +10,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,13 +18,19 @@ type attributeData struct {
 	Items []string `json:"items"`
 }
 
-type attributeExists struct {
-	Exists bool `json:"exists"`
+type attributeResult struct {
+	Exists   bool `json:"exists"`
+	Mistakes int  `json:"mistakes"`
+	Finished bool `json:"finished"`
 }
 
 type PostAttribute struct {
 	ClickedAttribute string   `json:"clickedAttribute"`
 	Attributes       []string `json:"attributes"`
+}
+
+func TestMain(m *testing.M) {
+	gin.SetMode(gin.TestMode)
 }
 
 // Helper function to create a temporary file with content
@@ -110,7 +117,7 @@ func TestCheckAttribute(t *testing.T) {
 	}
 	responseString := string(body)
 
-	var item attributeExists
+	var item attributeResult
 
 	err = json.Unmarshal([]byte(responseString), &item)
 	if err != nil {
@@ -119,4 +126,6 @@ func TestCheckAttribute(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.True(t, item.Exists, "Expected result to be true")
+	assert.Equal(t, item.Mistakes, 2)
+	assert.Equal(t, item.Finished, false)
 }
