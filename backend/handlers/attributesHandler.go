@@ -2,14 +2,14 @@ package handlers
 
 import (
 	"bufio"
+	"encoding/json"
 	"math/rand"
 	"net/http"
 	"os"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 func ReadLines(path string) ([]string, error) {
@@ -34,46 +34,57 @@ func ShuffleLines(lines []string) {
 	})
 }
 
-func GetItems(c *gin.Context) {
+func GetItems(w http.ResponseWriter, r *http.Request) {
 	has, err := ReadLines("./private/persons/1-has.txt")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to read 1-has.txt"})
+		http.Error(w, "Unable to read 1-has.txt", http.StatusInternalServerError)
 		return
 	}
 
 	hasNot, err := ReadLines("./private/persons/1-hasnot.txt")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to read 1-hasnot.txt"})
+		http.Error(w, "Unable to read 1-hasnot.txt", http.StatusInternalServerError)
 		return
 	}
 
 	items := append(has, hasNot...)
 	ShuffleLines(items)
 
-	c.JSON(http.StatusOK, gin.H{"items": items})
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{"items": items}); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
-func CheckAttribute(c *gin.Context) {
-	id := c.Param("id")
+func CheckAttribute(w http.ResponseWriter, r *http.Request) {
+	// Extract id from the URL path
+	pathParts := strings.Split(r.URL.Path, "/")
+	id := pathParts[len(pathParts)-2] // Assuming the path is /api/person/:id/check-attribute
+
 	_, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid person ID"})
+		http.Error(w, "Invalid person ID", http.StatusBadRequest)
 		return
 	}
 
 	var req struct {
-		ClickedAttribute string   `json:"clickedAttribute" binding:"required"`
-		Attributes       []string `json:"attributes" binding:"required"`
+		ClickedAttribute string   `json:"clickedAttribute"`
+		Attributes       []string `json:"attributes"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	if id == "" || len(id) == 0 {
+		http.Error(w, "Missing required fields", http.StatusBadRequest)
 		return
 	}
 
 	hasFilePath := "./private/persons/" + id + "-has.txt"
 	hasAttributes, err := ReadLines(hasFilePath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to read " + id + "-has.txt"})
+		http.Error(w, "Unable to read "+id+"-has.txt", http.StatusInternalServerError)
 		return
 	}
 
@@ -81,23 +92,24 @@ func CheckAttribute(c *gin.Context) {
 	mistakes := 0
 	for _, attribute := range req.Attributes {
 		if slices.Contains(hasAttributes, attribute) {
-			correct += 1
+			correct++
 		} else {
-			mistakes += 1
+			mistakes++
 		}
 	}
 
 	exists := slices.Contains(hasAttributes, req.ClickedAttribute)
 
 	if exists {
-		correct += 1
+		correct++
 	} else {
-		mistakes += 1
+		mistakes++
 	}
 
 	finished := correct == len(hasAttributes)
 
-	c.JSON(http.StatusOK, gin.H{
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
 		"exists":   exists,
 		"mistakes": mistakes,
 		"finished": finished,
