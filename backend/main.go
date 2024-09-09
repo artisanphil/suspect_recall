@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
-	"mime"
 	"net/http"
-	"path/filepath"
-	"strings"
 	"suspectRecall/handlers"
+
+	"github.com/gorilla/mux"
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,36 +14,18 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	mux := http.NewServeMux()
+	r := mux.NewRouter()
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "public/index.html")
 	})
 
-	mux.HandleFunc("/public/", func(w http.ResponseWriter, r *http.Request) {
-		ext := filepath.Ext(r.URL.Path)
-		mimeType := mime.TypeByExtension(ext)
+	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public"))))
 
-		if mimeType != "" {
-			w.Header().Set("Content-Type", mimeType)
-		}
+	r.HandleFunc("/api/person/attributes", handlers.GetItems)
 
-		http.ServeFile(w, r, "."+r.URL.Path)
-	})
-
-	mux.HandleFunc("/api/person/attributes", handlers.GetItems)
-	//mux.HandleFunc("/api/person/:id/check-attribute", handlers.CheckAttribute)
-	mux.HandleFunc("/api/person/", func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasSuffix(r.URL.Path, "/check-attribute") {
-			handlers.CheckAttribute(w, r)
-		} else {
-			http.NotFound(w, r)
-		}
-	})
+	r.HandleFunc("/api/person/{id}/check-attribute", handlers.CheckAttribute).Methods("POST")
 
 	log.Println("Listening on :8080...")
-	err := http.ListenAndServe(":8080", mux)
-	if err != nil {
-		log.Fatal(err)
-	}
+	http.ListenAndServe(":8080", r)
 }

@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 	"slices"
-	"strconv"
-	"strings"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func ReadLines(path string) ([]string, error) {
@@ -57,12 +57,10 @@ func GetItems(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckAttribute(w http.ResponseWriter, r *http.Request) {
-	// Extract id from the URL path
-	pathParts := strings.Split(r.URL.Path, "/")
-	id := pathParts[len(pathParts)-2] // Assuming the path is /api/person/:id/check-attribute
+	vars := mux.Vars(r)
+	id, ok := vars["id"] //getting id from route /api/person/{id}/check-attribute
 
-	_, err := strconv.Atoi(id)
-	if err != nil {
+	if !ok {
 		http.Error(w, "Invalid person ID", http.StatusBadRequest)
 		return
 	}
@@ -73,11 +71,6 @@ func CheckAttribute(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
-		return
-	}
-
-	if id == "" || len(id) == 0 {
-		http.Error(w, "Missing required fields", http.StatusBadRequest)
 		return
 	}
 
