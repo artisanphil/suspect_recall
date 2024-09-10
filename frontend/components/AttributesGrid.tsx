@@ -42,8 +42,6 @@ const AttributesGrid: React.FC = () => {
     if (items[index].clicked) return;
 
     const clickedAttribute = items[index].attribute;
-    console.log('Clicked item:', clickedAttribute);
-    console.log('person', personId);
   
     try {
       // Get all items with the class name `grid-item correct` or `grid-item wrong`
@@ -68,7 +66,6 @@ const AttributesGrid: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log(`Attribute exists: ${result.exists}`);
 
       setItems(prevItems => {
         const newItems = [...prevItems];

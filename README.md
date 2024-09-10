@@ -1,10 +1,16 @@
 # Suspect Recall
 
+## Build
+
+```
+npm install
+npm run frontend
+```
+
 ## Run locally 
 
 ```
-cd backend
-go run .
+npm run start
 ```
 
 go to http://localhost:8080
