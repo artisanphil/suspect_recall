@@ -8,6 +8,8 @@ interface Item {
 
 const AttributesGrid: React.FC = () => {    
   const [items, setItems] = useState<Item[]>([]);
+  const [finished, setFinished] = useState(false)
+  const [mistakes, setMistakes] = useState(0)
 
   // Prevent click of back button
   useEffect(() => {
@@ -72,24 +74,39 @@ const AttributesGrid: React.FC = () => {
         newItems[index] = { ...newItems[index], clicked: true, exists: result.exists };
         return newItems;
       });
+
+      setFinished(result.finished);
+      setMistakes(result.mistakes);
     } catch (error) {
       console.error(error);
     }    
   };
 
   return (
-    <div className="grid-container">
-      {items.map((item, index) => (
-        <div
-          key={index}
-          id={`item-${index}`}
-          className={`grid-item ${item.exists === null ? '' : item.exists ? 'correct' : 'wrong'}`}
-          onClick={() => handleClick(index, 1)}
-          style={{ cursor: item.clicked ? 'default' : 'pointer' }}
-        >
-          {item.attribute}
+    <div>
+      <div className="grid-container">
+        {items.map((item, index) => (
+          <div
+            key={index}
+            id={`item-${index}`}
+            className={`grid-item ${item.exists === null ? '' : item.exists ? 'correct' : 'wrong'}`}
+            onClick={() => handleClick(index, 1)}
+            style={{ cursor: item.clicked ? 'default' : 'pointer' }}
+          >
+            {item.attribute}
+          </div>
+        ))}
+        
+      </div>
+      {finished && (
+        <div>
+        <h2>Thank you for your valuable assistance in identifying the suspect.</h2>
+        {mistakes > 0 
+          ? "We have a close match in our database." 
+          : "We have an exact match in our database!"
+        }
         </div>
-      ))}
+      )}      
     </div>
   );
 };
