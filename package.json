@@ -20,9 +20,7 @@
   "scripts": {
     "start": "npm run frontend & npm run backend",
     "frontend": "watchify frontend/index.tsx -p [ tsify ] -o backend/public/bundle.js -v -d",
-    "backend": "cd backend; go run .",
-    "build": "react-scripts build",
-    "test": "react-scripts test"
+    "backend": "cd backend; go run ."
   },
   "eslintConfig": {
     "extends": [
