@@ -20,6 +20,7 @@
   "scripts": {
     "start": "npm run frontend & npm run backend",
     "frontend": "watchify frontend/index.tsx -p [ tsify ] -o backend/public/bundle.js -v -d",
+    "build": "react-scripts build",
     "backend": "cd backend; air",
     "eject": "react-scripts eject"
   },
