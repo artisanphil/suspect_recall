@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import './AttributesGrid.css';
+import { BASE_URL } from '../App';
 
 interface Item {
   attribute: string;
@@ -29,7 +31,7 @@ const AttributesGrid: React.FC = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await fetch('/api/person/attributes');
+        const response = await fetch(BASE_URL + '/person/attributes');
         const data = await response.json();
         setItems(data.items.map((item: string) => ({ attribute: item, clicked: false, exists: null })));
       } catch (error) {
@@ -55,7 +57,7 @@ const AttributesGrid: React.FC = () => {
         .map(item => item.attribute);
 
       // Post these items to the endpoint
-      const response = await fetch(`/api/person/${personId}/check-attribute`, {
+      const response = await fetch(BASE_URL + `/person/${personId}/check-attribute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

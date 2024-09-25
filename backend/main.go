@@ -6,21 +6,31 @@ import (
 	"suspectRecall/handlers"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "public/index.html")
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedHeaders:   []string{"Origin", "Content-Type", "Accept"},
+		AllowCredentials: true,
 	})
-
-	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public"))))
 
 	r.HandleFunc("/api/person/attributes", handlers.GetItems)
 
 	r.HandleFunc("/api/person/{id}/check-attribute", handlers.CheckAttribute).Methods("POST")
 
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "frontend/build/index.html")
+	})
+
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./frontend/build/static"))))
+	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./frontend/build/"))))
+
 	log.Println("Listening on :8080...")
-	http.ListenAndServe(":8080", r)
+
+	handler := c.Handler(r)
+	http.ListenAndServe(":8080", handler)
 }

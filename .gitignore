@@ -26,3 +26,4 @@ backend/public/bundle.js
 backend/.gcloudignore
 todo.txt
 backend/tmp/main
+backend/frontend/node_modules
