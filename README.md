@@ -3,28 +3,33 @@
 ## Build
 
 ```
+cd frontend
 npm install
-npm run frontend
+npm run build
 ```
 
 ## Run locally 
 
 ```
+add `REACT_APP_MODE=development` to .env file
+cd frontend
 npm run start
-```
 
-go to http://localhost:8080
+cd ..
+go run .
+go to http://localhost:3000
+
+(you can install air https://github.com/air-verse/air for live-reload)
+```
 
 ## Deploy to Google App Engine
 
 ```
-cd backend
 gcloud app deploy
 ```
 
 ## Tests
 
 ```
-cd backend/handlers
-go test .
+go test ./...
 ```

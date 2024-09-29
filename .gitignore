@@ -21,9 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-backend/gin-bin
-backend/public/bundle.js
-backend/.gcloudignore
 todo.txt
-backend/tmp/main
-backend/frontend/node_modules
+/tmp/main
+/frontend/node_modules
