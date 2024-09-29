@@ -20,7 +20,7 @@ const Game: React.FC = () => {
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       {showImage ? (
         <>
-          <img src="public/persons/1.png" alt="Person" />
+          <img src="/persons/1.png" alt="Person" />
           <p>Time left: {timeLeft} seconds</p>
         </>
       ) : (
