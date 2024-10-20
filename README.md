@@ -15,6 +15,7 @@ add `REACT_APP_MODE=development` to .env file
 cd frontend
 npm run start
 
+(another terminal window)
 cd ..
 go run .
 go to http://localhost:3000

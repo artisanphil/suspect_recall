@@ -3,14 +3,16 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,7 +32,14 @@ type PostAttribute struct {
 }
 
 func TestMain(m *testing.M) {
-	gin.SetMode(gin.TestMode)
+	err := os.Chdir("..")
+	if err != nil {
+		panic(err)
+	}
+
+	code := m.Run()
+
+	os.Exit(code)
 }
 
 // Helper function to create a temporary file with content
@@ -66,7 +75,15 @@ func TestShuffleLines(t *testing.T) {
 }
 
 func TestGetItems(t *testing.T) {
-	resp, err := http.Get("http://localhost:3000/api/person/attributes")
+	router := mux.NewRouter()
+	router.HandleFunc("/api/person/attributes", GetItems)
+
+	server := httptest.NewServer(router)
+	defer server.Close()
+
+	url := fmt.Sprintf("%s/api/person/attributes", server.URL)
+
+	resp, err := http.Get(url)
 	if err != nil {
 		t.Fatalf("Failed to make GET request: %v", err)
 	}
@@ -99,8 +116,18 @@ func TestCheckAttribute(t *testing.T) {
 	}
 	jsonData, err := json.Marshal(itemData)
 
+	router := mux.NewRouter()
+	router.HandleFunc("/api/person/{id}/check-attribute", CheckAttribute).Methods("POST")
+
+	// Use the router in the test server
+	server := httptest.NewServer(router)
+	defer server.Close()
+
+	url := fmt.Sprintf("%s/api/person/1/check-attribute", server.URL)
+	t.Log(url)
+
 	resp, err := http.Post(
-		"http://localhost:3000/api/person/1/check-attribute",
+		url,
 		"application/json",
 		bytes.NewBuffer(jsonData),
 	)
