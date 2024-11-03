@@ -18,6 +18,8 @@ func main() {
 		AllowCredentials: true,
 	})
 
+	r.HandleFunc("/api/person", handlers.GetPerson)
+
 	r.HandleFunc("/api/person/attributes", handlers.GetItems)
 
 	r.HandleFunc("/api/person/{id}/check-attribute", handlers.CheckAttribute).Methods("POST")
