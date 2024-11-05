@@ -8,7 +8,15 @@ interface Item {
   exists: boolean | null;
 }
 
-const AttributesGrid: React.FC = () => {    
+type Person = {
+  id: number;
+};
+
+type AttributesGridProps = {
+  person: Person;
+};
+
+const AttributesGrid: React.FC<AttributesGridProps> = ({ person }) => {    
   const [items, setItems] = useState<Item[]>([]);
   const [finished, setFinished] = useState(false)
   const [mistakes, setMistakes] = useState(0)
@@ -31,7 +39,8 @@ const AttributesGrid: React.FC = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await fetch(BASE_URL + '/person/attributes');
+        let personId = person.id;
+        const response = await fetch(BASE_URL + `/person/${personId}/attributes`);
         const data = await response.json();
         setItems(data.items.map((item: string) => ({ attribute: item, clicked: false, exists: null })));
       } catch (error) {
@@ -40,7 +49,7 @@ const AttributesGrid: React.FC = () => {
     };
 
     fetchItems();
-  }, []);
+  }, [person]);
 
   const handleClick = async (index: number, personId: number) => {
     if (items[index].clicked) return;
@@ -92,7 +101,7 @@ const AttributesGrid: React.FC = () => {
             key={index}
             id={`item-${index}`}
             className={`grid-item ${item.exists === null ? '' : item.exists ? 'correct' : 'wrong'}`}
-            onClick={() => handleClick(index, 1)}
+            onClick={() => handleClick(index, person.id)}
             style={{ cursor: item.clicked ? 'default' : 'pointer' }}
           >
             {item.attribute}

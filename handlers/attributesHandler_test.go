@@ -76,12 +76,12 @@ func TestShuffleLines(t *testing.T) {
 
 func TestGetItems(t *testing.T) {
 	router := mux.NewRouter()
-	router.HandleFunc("/api/person/attributes", GetItems)
+	router.HandleFunc("/api/person/{id}/attributes", GetItems)
 
 	server := httptest.NewServer(router)
 	defer server.Close()
 
-	url := fmt.Sprintf("%s/api/person/attributes", server.URL)
+	url := fmt.Sprintf("%s/api/person/1/attributes", server.URL)
 
 	resp, err := http.Get(url)
 	if err != nil {
