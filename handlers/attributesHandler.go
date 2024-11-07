@@ -35,15 +35,23 @@ func ShuffleLines(lines []string) {
 }
 
 func GetItems(w http.ResponseWriter, r *http.Request) {
-	has, err := ReadLines("./private/persons/1-has.txt")
-	if err != nil {
-		http.Error(w, "Unable to read 1-has.txt", http.StatusInternalServerError)
+	vars := mux.Vars(r)
+	id, ok := vars["id"] //getting id from route /api/person/{id}/attributes
+
+	if !ok {
+		http.Error(w, "Invalid person ID", http.StatusBadRequest)
 		return
 	}
 
-	hasNot, err := ReadLines("./private/persons/1-hasnot.txt")
+	has, err := ReadLines("./private/persons/" + id + "-has.txt")
 	if err != nil {
-		http.Error(w, "Unable to read 1-hasnot.txt", http.StatusInternalServerError)
+		http.Error(w, "Unable to read "+id+"-has.txt", http.StatusInternalServerError)
+		return
+	}
+
+	hasNot, err := ReadLines("./private/persons/" + id + "-hasnot.txt")
+	if err != nil {
+		http.Error(w, "Unable to read "+id+"-hasnot.txt", http.StatusInternalServerError)
 		return
 	}
 
