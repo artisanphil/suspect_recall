@@ -4,17 +4,27 @@ import { BASE_URL } from '../App';
 
 type Person = {
   id: number;
+  noMore: boolean;
 };
 
 const Game: React.FC = () => {
-  const [timeLeft, setTimeLeft] = useState(5);
   const [showImage, setShowImage] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(5);
+  const [reloadTrigger, setReloadTrigger] = useState(false);
   const [person, setPerson] = useState<Person | null>(null);
+
+  const reloadParent = () => {
+    // Update to force a re-render of the component
+    setShowImage(true);
+    setTimeLeft(5);
+    setReloadTrigger(prev => !prev); 
+  };    
+  
 
   useEffect(() => {
     const fetchPerson = async () => {
       try {
-        const response = await fetch('/api/person');
+        const response = await fetch('/api/person', {credentials: 'include'});
         const data: Person = await response.json();
         setPerson(data);
       } catch (error) {
@@ -23,7 +33,7 @@ const Game: React.FC = () => {
     };
 
     fetchPerson();
-  }, [])
+  }, [reloadTrigger])
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -50,7 +60,7 @@ const Game: React.FC = () => {
       ) : (
         <div>
           <p>Which attributes match this person?</p>
-          <AttributesGrid person={person} />
+          <AttributesGrid person={person} onReload={reloadParent} />
         </div>
       )}
     </div>
