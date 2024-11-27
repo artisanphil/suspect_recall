@@ -41,23 +41,28 @@ func GetPerson(w http.ResponseWriter, r *http.Request) {
 
 	rand.Seed(time.Now().UnixNano())
 
-	randomNum := rand.Intn(count) + 1
-
 	session, _ := store.Get(r, "session")
-
-	if inquired, ok := session.Values["inquired"].([]int); ok {
-		inquired = append(inquired, randomNum)
-		session.Values["inquired"] = inquired
+	var inquired []int
+	if sessionInquired, ok := session.Values["inquired"].([]int); ok {
+		inquired = sessionInquired
 	} else {
-		session.Values["inquired"] = []int{randomNum}
+		inquired = []int{}
 	}
+
+	if len(inquired) >= count {
+		inquired = []int{} //instead of deleting session
+	}
+
+	randomNum := getUniqueRandomNumber(count, inquired)
+
+	inquired = append(inquired, randomNum)
+	session.Values["inquired"] = inquired
 
 	sessionError := session.Save(r, w)
 	if sessionError != nil {
 		fmt.Printf("Failed to save session: %v\n", sessionError)
 	}
 
-	fmt.Println(session.Values["inquired"])
 	noMore := false
 	if val, ok := session.Values["inquired"].([]int); ok && len(val) == count {
 		noMore = true
@@ -66,4 +71,23 @@ func GetPerson(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(map[string]interface{}{"id": randomNum, "noMore": noMore}); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
+}
+
+func getUniqueRandomNumber(count int, inquired []int) int {
+	for {
+		randomNum := rand.Intn(count) + 1
+		if !contains(inquired, randomNum) {
+			return randomNum
+		}
+	}
+}
+
+// Helper function to check if a slice contains a number
+func contains(slice []int, num int) bool {
+	for _, v := range slice {
+		if v == num {
+			return true
+		}
+	}
+	return false
 }
