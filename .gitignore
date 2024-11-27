@@ -25,3 +25,5 @@ todo.txt
 /tmp/main
 /frontend/node_modules
 /frontend/build
+tmp/build-errors.log
+.env

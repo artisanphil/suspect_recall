@@ -10,13 +10,15 @@ interface Item {
 
 type Person = {
   id: number;
+  noMore: boolean;
 };
 
 type AttributesGridProps = {
   person: Person;
+  onReload: boolean
 };
 
-const AttributesGrid: React.FC<AttributesGridProps> = ({ person }) => {    
+const AttributesGrid: React.FC<AttributesGridProps> = ({ person, onReload }) => {    
   const [items, setItems] = useState<Item[]>([]);
   const [finished, setFinished] = useState(false)
   const [mistakes, setMistakes] = useState(0)
@@ -40,7 +42,11 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person }) => {
     const fetchItems = async () => {
       try {
         let personId = person.id;
-        const response = await fetch(BASE_URL + `/person/${personId}/attributes`);
+        const response = await fetch(
+          BASE_URL + `/person/${personId}/attributes`, {
+            credentials: 'include',
+          }          
+        );
         const data = await response.json();
         setItems(data.items.map((item: string) => ({ attribute: item, clicked: false, exists: null })));
       } catch (error) {
@@ -93,6 +99,10 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person }) => {
     }    
   };
 
+  const nextSuspect = () => {
+    console.log("Show next suspect")
+  }
+
   return (
     <div>
       <div className="grid-container">
@@ -115,6 +125,15 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person }) => {
         {mistakes > 0 
           ? "We have a close match in our database." 
           : "We have an exact match in our database!"
+        }
+        {
+          person.noMore ? (
+            <div>No more suspects available!</div>           
+          ) : (
+            <div>
+              <button onClick={onReload}>Show next suspect</button>
+            </div>
+          )
         }
         </div>
       )}      
