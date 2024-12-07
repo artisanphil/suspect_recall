@@ -119,7 +119,7 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person, onReload }) => 
         ))}
         
       </div>
-      {finished && (
+      {finished ? (
         <div class="thank-you-section">
         <h2>Thank you for your valuable assistance in identifying the suspect.</h2>
         <p>
@@ -138,6 +138,8 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person, onReload }) => 
         }
         </p>
         </div>
+      ) : (
+        <div>You need to check all the attributes that the suspect has before you can continue</div>
       )}      
     </div>
   );

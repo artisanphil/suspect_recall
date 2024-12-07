@@ -15,7 +15,9 @@ const Game: React.FC = () => {
 
   const reloadParent = () => {
     // Update to force a re-render of the component
-    setShowImage(true);
+    if (person) {
+      setShowImage(true);
+    }
     setTimeLeft(5);
     setReloadTrigger(prev => !prev); 
   };    
