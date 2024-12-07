@@ -1,5 +1,6 @@
 import React from 'react';
 import Game from './components/Game';
+import './App.css';
 
 export const BASE_URL = process.env.REACT_APP_MODE === "development" ? "http://localhost:8080/api" : "/api";
 

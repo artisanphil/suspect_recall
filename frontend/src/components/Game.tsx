@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AttributesGrid from './AttributesGrid';
-import { BASE_URL } from '../App';
+import './Game.css';
 
 type Person = {
   id: number;
@@ -47,14 +47,17 @@ const Game: React.FC = () => {
   }, [timeLeft]);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+    <div className="text-center mt-12 max-w-full max-h-full">
       {showImage ? (
         <>
            {person ? (
-            <img src={`/persons/${person.id}.png`} alt="Person" />
+            <div>
+              <h1>Take a good look at the suspect!</h1>
+              <img className="suspect" src={`/persons/${person.id}.png`} alt="Person" />
+            </div>
           ) : (
             <p>Loading...</p>
-          )}
+          )}          
           <p>Time left: {timeLeft} seconds</p>
         </>
       ) : (

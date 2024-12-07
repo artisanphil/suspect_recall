@@ -120,8 +120,9 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person, onReload }) => 
         
       </div>
       {finished && (
-        <div>
+        <div class="thank-you-section">
         <h2>Thank you for your valuable assistance in identifying the suspect.</h2>
+        <p>
         {mistakes > 0 
           ? "We have a close match in our database." 
           : "We have an exact match in our database!"
@@ -135,6 +136,7 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person, onReload }) => 
             </div>
           )
         }
+        </p>
         </div>
       )}      
     </div>
