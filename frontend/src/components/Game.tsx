@@ -58,7 +58,9 @@ const Game: React.FC = () => {
               {person ? (
                 <div>
                   <h1>Take a good look at the suspect!</h1>
-                  <img className="suspect" src={`/persons/${person.id}.png`} alt="Person" />
+                    <div className="flex justify-center">
+                      <img className="suspect" src={`/persons/${person.id}.png`} alt="Person" />
+                    </div>                    
                 </div>
               ) : (
                 <p>Loading...</p>
