@@ -139,7 +139,7 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person, onReload }) => 
         </p>
         </div>
       ) : (
-        <div>You need to check all the attributes that the suspect has before you can continue</div>
+        <div>You need to select all the attributes that the suspect has before you can continue.</div>
       )}      
     </div>
   );
