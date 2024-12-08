@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AttributesGrid from './AttributesGrid';
-import { BASE_URL } from '../App';
+import './Game.css';
 
 type Person = {
   id: number;
@@ -15,16 +15,18 @@ const Game: React.FC = () => {
 
   const reloadParent = () => {
     // Update to force a re-render of the component
-    setShowImage(true);
+    if (person) {
+      setShowImage(true);
+    }
     setTimeLeft(5);
-    setReloadTrigger(prev => !prev); 
-  };    
-  
+    setReloadTrigger(prev => !prev);
+  };
+
 
   useEffect(() => {
     const fetchPerson = async () => {
       try {
-        const response = await fetch('/api/person', {credentials: 'include'});
+        const response = await fetch('/api/person', { credentials: 'include' });
         const data: Person = await response.json();
         setPerson(data);
       } catch (error) {
@@ -47,22 +49,30 @@ const Game: React.FC = () => {
   }, [timeLeft]);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      {showImage ? (
-        <>
-           {person ? (
-            <img src={`/persons/${person.id}.png`} alt="Person" />
+    <div className="App">
+      <header className="App-header min-h-screen flex flex-col">
+
+        <div className="text-center mt-12 max-w-full max-h-full">
+          {showImage ? (
+            <>
+              {person ? (
+                <div>
+                  <h1>Take a good look at the suspect!</h1>
+                  <img className="suspect" src={`/persons/${person.id}.png`} alt="Person" />
+                </div>
+              ) : (
+                <p>Loading...</p>
+              )}
+              <p>Time left: {timeLeft} seconds</p>
+            </>
           ) : (
-            <p>Loading...</p>
+            <div>
+              <h1>Which attributes match this person?</h1>
+              <AttributesGrid person={person} onReload={reloadParent} />
+            </div>
           )}
-          <p>Time left: {timeLeft} seconds</p>
-        </>
-      ) : (
-        <div>
-          <p>Which attributes match this person?</p>
-          <AttributesGrid person={person} onReload={reloadParent} />
         </div>
-      )}
+      </header>
     </div>
   );
 };

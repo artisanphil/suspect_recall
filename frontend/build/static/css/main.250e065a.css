@@ -1,2 +1,0 @@
-.grid-container{grid-gap:10px;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));padding:10px}.grid-item{background-color:#f0f0f0;border:1px solid #ccc;cursor:pointer;padding:10px;text-align:center;transition:background-color .3s ease}.grid-item.correct{background-color:green;color:#fff}.grid-item.wrong{background-color:red;color:#fff}.grid-item:not(.correct):not(.wrong):hover{background-color:#ddd}
-/*# sourceMappingURL=main.250e065a.css.map*/
