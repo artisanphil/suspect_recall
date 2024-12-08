@@ -1,13 +1,15 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import Game from './components/Game';
 import './App.css';
 
 export const BASE_URL = process.env.REACT_APP_MODE === "development" ? "http://localhost:8080/api" : "/api";
 
-const App: React.FC = () => {
+const Home: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="App">
-      <header className="App-header min-h-screen flex flex-col">
+      <header className="min-h-screen flex flex-col">
         <div className="bg-gray-100 flex flex-col items-center justify-center p-4 flex-1">
           <div className="text-center flex flex-col items-center space-y-6 w-full">
             <h1 className="text-6xl font-wild-west text-gray-800">Suspect Recall</h1>
@@ -23,7 +25,7 @@ const App: React.FC = () => {
             </p>
             <button
               className="bg-blue-600 text-white py-3 px-6 rounded-md text-lg hover:bg-blue-700 transition duration-300"
-              onClick={() => alert('Starting game...')}
+              onClick={() => navigate("/game")}
             >
               Start Game
             </button>
@@ -31,6 +33,17 @@ const App: React.FC = () => {
         </div>
       </header>
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/game" element={<Game />} />
+      </Routes>
+    </Router>
   );
 };
 

@@ -13,48 +13,6 @@
   }
 }
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f5f5f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.App-header {
-  text-align: center;
-  margin: 5px 0;
-}
-
-/*
-.App-header p {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 20px;
-}
-*/
-.App-link {
-  color: #61dafb;
-}
-
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

@@ -19,14 +19,14 @@ const Game: React.FC = () => {
       setShowImage(true);
     }
     setTimeLeft(5);
-    setReloadTrigger(prev => !prev); 
-  };    
-  
+    setReloadTrigger(prev => !prev);
+  };
+
 
   useEffect(() => {
     const fetchPerson = async () => {
       try {
-        const response = await fetch('/api/person', {credentials: 'include'});
+        const response = await fetch('/api/person', { credentials: 'include' });
         const data: Person = await response.json();
         setPerson(data);
       } catch (error) {
@@ -49,25 +49,30 @@ const Game: React.FC = () => {
   }, [timeLeft]);
 
   return (
-    <div className="text-center mt-12 max-w-full max-h-full">
-      {showImage ? (
-        <>
-           {person ? (
-            <div>
-              <h1>Take a good look at the suspect!</h1>
-              <img className="suspect" src={`/persons/${person.id}.png`} alt="Person" />
-            </div>
+    <div className="App">
+      <header className="App-header min-h-screen flex flex-col">
+
+        <div className="text-center mt-12 max-w-full max-h-full">
+          {showImage ? (
+            <>
+              {person ? (
+                <div>
+                  <h1>Take a good look at the suspect!</h1>
+                  <img className="suspect" src={`/persons/${person.id}.png`} alt="Person" />
+                </div>
+              ) : (
+                <p>Loading...</p>
+              )}
+              <p>Time left: {timeLeft} seconds</p>
+            </>
           ) : (
-            <p>Loading...</p>
-          )}          
-          <p>Time left: {timeLeft} seconds</p>
-        </>
-      ) : (
-        <div>
-          <p>Which attributes match this person?</p>
-          <AttributesGrid person={person} onReload={reloadParent} />
+            <div>
+              <h1>Which attributes match this person?</h1>
+              <AttributesGrid person={person} onReload={reloadParent} />
+            </div>
+          )}
         </div>
-      )}
+      </header>
     </div>
   );
 };
