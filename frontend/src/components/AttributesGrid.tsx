@@ -25,6 +25,7 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person, onReload }) => 
 
   // Prevent click of back button
   useEffect(() => {
+    window.scrollTo(0, 0);
     window.history.pushState(null, '', window.location.href);
 
     const handlePopState = () => {
@@ -91,6 +92,10 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person, onReload }) => 
         newItems[index] = { ...newItems[index], clicked: true, exists: result.exists };
         return newItems;
       });
+
+      if(result.finished === true) {
+        window.scrollTo(0, document.body.scrollHeight + 20);
+      }
 
       setFinished(result.finished);
       setMistakes(result.mistakes);
