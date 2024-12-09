@@ -24,6 +24,7 @@ const Game: React.FC = () => {
 
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchPerson = async () => {
       try {
         const response = await fetch('/api/person', { credentials: 'include' });

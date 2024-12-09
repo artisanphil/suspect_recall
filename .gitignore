@@ -27,3 +27,4 @@ todo.txt
 /frontend/build
 tmp/build-errors.log
 .env
+frontend/.env
