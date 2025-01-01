@@ -12,7 +12,7 @@ const Game: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(5);
   const [reloadTrigger, setReloadTrigger] = useState(false);
   const [person, setPerson] = useState<Person | null>(null);
-
+  
   const reloadParent = () => {
     // Update to force a re-render of the component
     if (person) {
@@ -22,6 +22,10 @@ const Game: React.FC = () => {
     setReloadTrigger(prev => !prev);
   };
 
+  const handleLoadSameSuspect = () => {
+    setShowImage(true);
+    setTimeLeft(5);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -71,7 +75,7 @@ const Game: React.FC = () => {
           ) : (
             <div>
               <h1>Which attributes match this person?</h1>
-              <AttributesGrid person={person} onReload={reloadParent} />
+              <AttributesGrid person={person} loadSameSuspect={handleLoadSameSuspect} loadNextSuspect={reloadParent} />
             </div>
           )}
         </div>
