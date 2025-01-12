@@ -2,14 +2,21 @@ package handlers
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
+	"fmt"
+	"log"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"slices"
+	"strings"
 	"time"
 
+	firebase "firebase.google.com/go"
 	"github.com/gorilla/mux"
+	"google.golang.org/api/option"
 )
 
 func ReadLines(path string) ([]string, error) {
@@ -109,10 +116,65 @@ func CheckAttribute(w http.ResponseWriter, r *http.Request) {
 
 	finished := correct == len(hasAttributes)
 
+	SaveUserActions(id, req.ClickedAttribute, exists, finished, getIPAddress(r))
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"exists":   exists,
 		"mistakes": mistakes,
 		"finished": finished,
 	})
+}
+
+func SaveUserActions(personId string, attribute string, exists bool, finished bool, ipAddress string) {
+	ctx := context.Background()
+	sa := option.WithCredentialsFile("private/serviceAccount.json")
+	app, err := firebase.NewApp(ctx, nil, sa)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer client.Close()
+
+	fmt.Println("Successfully connected to Firestore!")
+
+	_, _, err = client.Collection("user-actions").Add(ctx, map[string]interface{}{
+		"ip_address": ipAddress,
+		"person_id":  personId,
+		"attribute":  attribute,
+		"correct":    exists,
+		"finished":   finished,
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func getIPAddress(r *http.Request) string {
+	// Check if the app is behind a proxy and use the "X-Forwarded-For" header
+	// X-Forwarded-For may contain a comma-separated list of IP addresses.
+	// The first one is the client's IP address.
+	forwarded := r.Header.Get("X-Forwarded-For")
+	if forwarded != "" {
+		ips := strings.Split(forwarded, ",")
+		return strings.TrimSpace(ips[0]) // Return the first IP
+	}
+
+	// Check the "X-Real-Ip" header if available
+	realIP := r.Header.Get("X-Real-Ip")
+	if realIP != "" {
+		return realIP
+	}
+
+	// Fallback to using the remote address
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr // If parsing fails, return as-is
+	}
+
+	return ip
 }

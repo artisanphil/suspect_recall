@@ -28,3 +28,4 @@ todo.txt
 tmp/build-errors.log
 .env
 frontend/.env
+private/serviceAccount.json
