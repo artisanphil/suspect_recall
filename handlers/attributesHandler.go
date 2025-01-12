@@ -14,7 +14,9 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"google.golang.org/api/option"
 )
@@ -142,13 +144,16 @@ func SaveUserActions(personId string, attribute string, exists bool, finished bo
 
 	fmt.Println("Successfully connected to Firestore!")
 
-	_, _, err = client.Collection("user-actions").Add(ctx, map[string]interface{}{
+	data := map[string]interface{}{
 		"ip_address": ipAddress,
 		"person_id":  personId,
 		"attribute":  attribute,
 		"correct":    exists,
 		"finished":   finished,
-	})
+		"timestamp":  firestore.ServerTimestamp,
+	}
+	documentID := time.Now().Format("2006-01-02T15:04:05") + "-" + uuid.New().String()
+	_, err = client.Collection("user-actions").Doc(documentID).Set(ctx, data)
 	if err != nil {
 		log.Fatalln(err)
 	}
