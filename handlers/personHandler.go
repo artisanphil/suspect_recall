@@ -67,6 +67,7 @@ func GetPerson(w http.ResponseWriter, r *http.Request) {
 	if val, ok := session.Values["inquired"].([]int); ok && len(val) == count {
 		noMore = true
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(map[string]interface{}{"id": randomNum, "noMore": noMore}); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
