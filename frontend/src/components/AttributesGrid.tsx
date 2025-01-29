@@ -54,7 +54,17 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person, loadNextSuspect
         }
         );
         const data = await response.json();
-        setItems(data.items.map((item: string) => ({ attribute: item, clicked: false, exists: null })));
+        setItems(
+          data.items.map((item) => ({
+            attribute: item,
+            clicked: false,
+            exists: data.correct && data.correct.includes(item)
+              ? true 
+              : data.wrong && data.wrong.includes(item)
+              ? false 
+              : null, 
+          }))
+        );
       } catch (error) {
         console.error('Error fetching items:', error);
       }
@@ -140,8 +150,10 @@ const AttributesGrid: React.FC<AttributesGridProps> = ({ person, loadNextSuspect
             key={index}
             id={`item-${index}`}
             className={`grid-item ${item.exists === null ? '' : item.exists ? 'correct' : 'wrong'}`}
-            onClick={() => handleClick(index, person.id)}
-            style={{ cursor: item.clicked ? 'default' : 'pointer' }}
+            {...(item.exists === null && {
+              onClick: () => handleClick(index, person.id),
+            })}
+            style={{ cursor: item.exists != null || item.clicked ? 'default' : 'pointer' }}
           >
             {item.attribute}
           </div>
