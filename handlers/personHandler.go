@@ -57,6 +57,8 @@ func GetPerson(w http.ResponseWriter, r *http.Request) {
 
 	inquired = append(inquired, randomNum)
 	session.Values["inquired"] = inquired
+	session.Values["correctAttributes"] = []string{}
+	session.Values["wrongAttributes"] = []string{}
 
 	sessionError := session.Save(r, w)
 	if sessionError != nil {

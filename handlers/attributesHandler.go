@@ -18,6 +18,7 @@ import (
 	firebase "firebase.google.com/go"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"google.golang.org/api/option"
 )
 
@@ -44,6 +45,9 @@ func ShuffleLines(lines []string) {
 }
 
 func GetItems(w http.ResponseWriter, r *http.Request) {
+	var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+	session, _ := store.Get(r, "session")
+
 	vars := mux.Vars(r)
 	id, ok := vars["id"] //getting id from route /api/person/{id}/attributes
 
@@ -65,15 +69,27 @@ func GetItems(w http.ResponseWriter, r *http.Request) {
 	}
 
 	items := append(has, hasNot...)
+	for i := range items {
+		items[i] = strings.TrimSpace(items[i])
+	}
 	ShuffleLines(items)
 
+	correctAttributes, ok := session.Values["correctAttributes"].([]string)
+	wrongAttributes, ok := session.Values["wrongAttributes"].([]string)
+
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(map[string]interface{}{"items": items}); err != nil {
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{
+		"items":   items,
+		"correct": correctAttributes,
+		"wrong":   wrongAttributes,
+	}); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 }
 
 func CheckAttribute(w http.ResponseWriter, r *http.Request) {
+	var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+
 	vars := mux.Vars(r)
 	id, ok := vars["id"] //getting id from route /api/person/{id}/check-attribute
 
@@ -98,6 +114,10 @@ func CheckAttribute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for i, line := range hasAttributes {
+		hasAttributes[i] = strings.TrimSpace(line)
+	}
+
 	correct := 0
 	mistakes := 0
 	for _, attribute := range req.Attributes {
@@ -108,12 +128,42 @@ func CheckAttribute(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	exists := slices.Contains(hasAttributes, req.ClickedAttribute)
+	session, _ := store.Get(r, "session")
+
+	clickedAttribute := strings.TrimSpace(req.ClickedAttribute)
+	exists := slices.Contains(hasAttributes, clickedAttribute)
 
 	if exists {
 		correct++
+
+		var correctAttributes []string
+		if sessionCorrect, ok := session.Values["correctAttributes"].([]string); ok {
+			correctAttributes = sessionCorrect
+		} else {
+			correctAttributes = []string{}
+		}
+
+		correctAttributes = append(correctAttributes, clickedAttribute)
+		session.Values["correctAttributes"] = correctAttributes
+
 	} else {
 		mistakes++
+
+		var wrongAttributes []string
+		if sessionWrong, ok := session.Values["wrongAttributes"].([]string); ok {
+			wrongAttributes = sessionWrong
+		} else {
+			wrongAttributes = []string{}
+		}
+
+		wrongAttributes = append(wrongAttributes, clickedAttribute)
+		session.Values["wrongAttributes"] = wrongAttributes
+
+	}
+
+	sessionError := session.Save(r, w)
+	if sessionError != nil {
+		fmt.Printf("Failed to save session: %v\n", sessionError)
 	}
 
 	finished := correct == len(hasAttributes)
